@@ -46,6 +46,7 @@ def calculate_single_pack_dependencies(pack: str, dependency_graph: object) -> T
         all_level_dependencies: A list with all dependencies names
         pack: The pack name
     """
+    install_logging('Calculate Packs Dependencies.log', include_process_name=True)
     first_level_dependencies = {}
     all_level_dependencies = []
     try:
@@ -158,7 +159,7 @@ def main():
     packs dependencies. The logic of pack dependency is identical to sdk find-dependencies command.
 
     """
-    install_logging('Calculate Packs Dependencies.log')
+    install_logging('Calculate Packs Dependencies.log', include_process_name=True)
     option = option_handler()
     output_path = option.output_path
     id_set_path = option.id_set_path

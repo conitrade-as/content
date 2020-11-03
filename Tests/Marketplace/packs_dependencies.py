@@ -32,14 +32,14 @@ def calculate_single_pack_dependencies(pack: str, dependency_graph: object) -> T
     Calculates pack dependencies given a pack and a dependencies graph.
     First is extract the dependencies subgraph of the given graph only using DFS algorithm with the pack as source.
 
-    Then, for all the dependencies of that pack it Replaces the 'mandatory_for' key with a boolean key 'mandatory'
+    Then, for all the dependencies of that pack it Replaces the 'mandatory_for_packs' key with a boolean key 'mandatory'
     which indicates whether this dependency is mandatory for this pack or not.
 
     Then using that subgraph we get the first-level dependencies and all-levels dependencies.
 
     Args:
         pack: The pack for which we need to calculate the dependencies
-        dependency_graph:
+        dependency_graph: The full dependencies graph
 
     Returns:
         first_level_dependencies: A dict of the form {'dependency_name': {'mandatory': < >, 'display_name': < >}}
@@ -54,8 +54,8 @@ def calculate_single_pack_dependencies(pack: str, dependency_graph: object) -> T
         subgraph = PackDependencies.get_dependencies_subgraph_by_dfs(dependency_graph, pack)
         for dependency_pack, additional_data in subgraph.nodes(data=True):
             logging.debug(f'Iterating dependency {dependency_pack} for pack {pack}')
-            additional_data['mandatory'] = pack in additional_data['mandatory_for']
-            del additional_data['mandatory_for']
+            additional_data['mandatory'] = pack in additional_data['mandatory_for_packs']
+            del additional_data['mandatory_for_packs']
             first_level_dependencies, all_level_dependencies = parse_for_pack_metadata(subgraph, pack)
     except Exception:
         logging.exception(f"Failed calculating {pack} pack dependencies")
@@ -129,8 +129,6 @@ def calculate_all_packs_dependencies(pack_dependencies_result: dict, id_set: dic
         This is a callback that should be called once the result of the future is ready.
         The results include: first_level_dependencies, all_level_dependencies, pack_name
         Using these results we write the dependencies
-        Returns:
-            object:
         """
         try:
             first_level_dependencies, all_level_dependencies, pack_name = future.result()  # blocks until results ready
